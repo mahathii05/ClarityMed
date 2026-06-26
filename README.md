@@ -32,15 +32,17 @@ claritymed-v3/
 
 ## Features
 
-- 🔬 **Report Simplification** — plain-language explanation of every lab result (Llama 3.3 70B)
-- 🏷️ **Severity Badges** — Normal / Watch / Urgent per finding
-- 🥗 **Diet Planner** — personalised meal plan based on actual lab results
-- 📋 **Next Actions** — doctor visits, exercises, follow-up tests, warning signs
+- 🔬 **Report Simplification** — plain-language explanation of every lab result (Llama 3.3 70B, with fallback chain to Llama 3.1, GPT-OSS 20B, and GPT-OSS 120B)
+- 📊 **Summary Metrics Dashboard** — sliding graphical gauges for numeric ranges and color-coded status badges for qualitative results
+- ⚡ **Interactive Document View & Syncing** — dual pane split-view where selecting text on the interactive sheet automatically highlights and expands the matching card on the right, and vice-versa
+- 🎨 **Earthy Sage Green Theme** — beautiful light-mode styling utilizing Calm Sage Green (#67a387) accents and a soft, warm sand/alabaster background (#fbfbfa)
+- 🥗 **Diet Planner** — personalised meal plan based on lab results (powered by CrewAI and Llama 4 Scout 17B)
+- 📋 **Next Actions** — doctor visits, exercises, follow-up tests, warning signs (powered by CrewAI and Llama 4 Scout 17B)
 - 💬 **AI Chatbot** — ask follow-up questions about your report (Llama 3.1 8B)
 - 🎤 **Voice Input** — speak questions, transcribed by Whisper Large V3
 - 🔊 **Read Aloud** — TTS reads any result or summary aloud
 - 📄 **Download PDF** — save a formatted simplified report
-- 🌙 **Dark Mode** — full dark/light theme
+- 🌙 **Dark Mode** — support for dark theme
 - 📱 **Mobile Responsive** — works on all screen sizes
 
 ---
