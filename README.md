@@ -1,4 +1,4 @@
-# ClarityMed v3 — AI Medical Report Simplifier
+# ClarityMed — AI Medical Report Simplifier
 ### Python (FastAPI) backend · React (Vite) frontend
 
 The Groq API key lives **only in `server/.env`** — the browser never sees it.
