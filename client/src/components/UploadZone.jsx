@@ -65,12 +65,12 @@ export default function UploadZone({ onFileSelect, processing }) {
         onDragLeave={onDragLeave}
         onClick={() => !selectedFile && inputRef.current?.click()}
         className={`
-          relative rounded-2xl border-2 border-dashed p-10 text-center transition-all duration-200 cursor-pointer
+          relative rounded-3xl border-2 border-dashed p-10 text-center transition-all duration-300 cursor-pointer
           ${dragOver
-            ? 'border-clarity-500 bg-clarity-50 dark:bg-clarity-950/30'
+            ? 'border-clarity-400 bg-clarity-50/50 dark:bg-clarity-950/20'
             : selectedFile
-            ? 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 cursor-default'
-            : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-clarity-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+            ? 'border-emerald-350 bg-emerald-50/30 dark:bg-emerald-950/10 cursor-default'
+            : 'border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900/60 hover:border-clarity-400 hover:bg-clarity-50/20 dark:hover:border-clarity-950/20'
           }
         `}
       >

@@ -72,10 +72,33 @@ export async function generateReportPDF(reportData) {
     y += 5
   }
 
-  checkPage(20)
-  doc.line(MARGIN, y, W - MARGIN, y); y += 5
-  doc.setFontSize(8); doc.setFont('helvetica', 'italic'); doc.setTextColor(130, 130, 130)
-  const d = doc.splitTextToSize('ClarityMed is an informational tool and does not constitute medical advice. Always consult a qualified healthcare professional.', TEXT_WIDTH)
-  doc.text(d, MARGIN, y)
+  checkPage(30)
+  y += 5
+  const boxPadding = 4
+  const boxWidth = TEXT_WIDTH
+  
+  doc.setFontSize(8.5)
+  const bodyText = 'ClarityMed is an informational tool only and does not constitute medical advice. Always consult a qualified healthcare professional regarding your test results and health decisions.'
+  const lines = doc.splitTextToSize(bodyText, boxWidth - boxPadding * 2)
+  
+  const headingHeight = 5
+  const boxHeight = headingHeight + lines.length * 4 + boxPadding * 2
+  
+  // Draw light yellow/amber box
+  doc.setFillColor(254, 252, 232)
+  doc.setDrawColor(254, 240, 138)
+  doc.roundedRect(MARGIN, y, boxWidth, boxHeight, 2, 2, 'FD')
+  
+  // Draw bold heading
+  doc.setFont('helvetica', 'bold')
+  doc.setTextColor(133, 77, 14)
+  doc.text('Medical Disclaimer', MARGIN + boxPadding, y + boxPadding + 3)
+  
+  // Draw normal body text
+  doc.setFont('helvetica', 'normal')
+  doc.setTextColor(113, 63, 18)
+  doc.text(lines, MARGIN + boxPadding, y + boxPadding + headingHeight + 3)
+  
+  y += boxHeight + 5
   doc.save('ClarityMed-Report.pdf')
 }

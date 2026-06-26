@@ -23,7 +23,8 @@ Return ONLY a valid JSON object with this exact structure:
       "severity": "Normal|Watch|Urgent",
       "plainExplanation": "2-3 sentences a patient can understand",
       "whatItMeans": "What this result means for the patient health",
-      "suggestedQuestion": "A question the patient could ask their doctor"
+      "suggestedQuestion": "A question the patient could ask their doctor",
+      "originalSegment": "The exact verbatim text segment or line from the original report that matches this test/finding (e.g. 'Hemoglobin 9.2 g/dL [12.0 - 16.0]')"
     }
   ]
 }
@@ -46,12 +47,26 @@ async def simplify_report(body: SimplifyRequest):
         from fastapi import HTTPException
         raise HTTPException(status_code=400, detail="reportText is required")
 
-    raw = await groq_chat(
-        model="llama-3.3-70b-versatile",
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": f"Simplify this medical report:\n\n{body.reportText}"},
-        ],
-        max_tokens=4096,
-    )
-    return parse_json(raw)
+    from fastapi import HTTPException
+    models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "openai/gpt-oss-20b", "openai/gpt-oss-120b"]
+    last_error = None
+
+    for m in models:
+        try:
+            raw = await groq_chat(
+                model=m,
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": f"Simplify this medical report:\n\n{body.reportText}"},
+                ],
+                max_tokens=4096,
+            )
+            return parse_json(raw)
+        except Exception as e:
+            import sys
+            print(f"Model {m} failed: {e}", file=sys.stderr)
+            last_error = e
+
+    if isinstance(last_error, HTTPException):
+        raise last_error
+    raise HTTPException(status_code=502, detail=str(last_error))

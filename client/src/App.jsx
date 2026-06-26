@@ -7,12 +7,11 @@ import { extractTextFromPDF } from './utils/pdfExtract.js'
 import { api } from './utils/api.js'
 
 export default function App() {
-  const [darkMode, setDarkMode] = useState(() =>
-    typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches
-  )
+  const [darkMode, setDarkMode] = useState(false)
   const [stage, setStage] = useState('upload') // upload | processing | report
   const [reportData, setReportData] = useState(null)
   const [originalText, setOriginalText] = useState('')
+  const [uploadedFile, setUploadedFile] = useState(null)
   const [error, setError] = useState('')
   const [processingStep, setProcessingStep] = useState('')
 
@@ -24,6 +23,7 @@ export default function App() {
     setError('')
     setStage('processing')
     setProcessingStep('Extracting text from PDF…')
+    setUploadedFile(file)
 
     try {
       const text = await extractTextFromPDF(file)
@@ -43,6 +43,7 @@ export default function App() {
     setStage('upload')
     setReportData(null)
     setOriginalText('')
+    setUploadedFile(null)
     setError('')
     setProcessingStep('')
   }
@@ -90,6 +91,7 @@ export default function App() {
           <ReportView
             reportData={reportData}
             originalText={originalText}
+            uploadedFile={uploadedFile}
           />
         )}
       </main>
@@ -97,7 +99,7 @@ export default function App() {
       <footer className="border-t border-slate-100 dark:border-slate-800 mt-12 py-6 no-print">
         <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
           <span>© {new Date().getFullYear()} ClarityMed — AI-powered medical report simplifier</span>
-          <span>Powered by Groq · Llama 3.3 70B · Whisper Large V3</span>
+          <span>Powered by Groq · Llama & GPT-OSS Models · Whisper Large V3</span>
         </div>
       </footer>
     </div>
