@@ -8,3 +8,4 @@ server/.env
 client/.env.local
 .DS_Store
 *.local
+server/.env
