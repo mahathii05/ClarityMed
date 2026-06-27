@@ -24,7 +24,7 @@ async def groq_chat(
     max_tokens: int = 4096,
 ) -> str:
     api_key = get_api_key()
-    async with httpx.AsyncClient(timeout=60) as client:
+    async with httpx.AsyncClient(timeout=60, verify=False) as client:
         resp = await client.post(
             GROQ_CHAT_URL,
             headers={

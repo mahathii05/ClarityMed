@@ -9,11 +9,13 @@ export default function UploadZone({ onFileSelect, processing }) {
 
   const validateFile = (file) => {
     if (!file) return 'No file selected.'
-    if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
-      return 'Please upload a PDF file.'
+    const isPDF = file.type === 'application/pdf' || file.name.endsWith('.pdf')
+    const isImage = file.type.startsWith('image/') || /\.(png|jpe?g)$/i.test(file.name)
+    if (!isPDF && !isImage) {
+      return 'Please upload a PDF or an image (PNG, JPEG).'
     }
     if (file.size > 20 * 1024 * 1024) {
-      return 'File is too large. Please upload a PDF under 20 MB.'
+      return 'File is too large. Please upload a file under 20 MB.'
     }
     return null
   }
@@ -54,7 +56,7 @@ export default function UploadZone({ onFileSelect, processing }) {
           <span className="text-clarity-600">medical report</span> — in plain words
         </h1>
         <p className="text-slate-500 dark:text-slate-400 text-base">
-          Upload your lab report PDF. ClarityMed will explain every result in language anyone can understand.
+          Upload your lab report PDF or image. ClarityMed will explain every result in language anyone can understand.
         </p>
       </div>
 
@@ -77,7 +79,7 @@ export default function UploadZone({ onFileSelect, processing }) {
         <input
           ref={inputRef}
           type="file"
-          accept=".pdf,application/pdf"
+          accept=".pdf,application/pdf,image/png,image/jpeg,image/jpg"
           className="hidden"
           onChange={(e) => handleFile(e.target.files[0])}
         />
@@ -106,7 +108,7 @@ export default function UploadZone({ onFileSelect, processing }) {
             </div>
             <div>
               <p className="font-semibold text-slate-700 dark:text-slate-200">
-                {dragOver ? 'Drop your PDF here' : 'Drag & drop your PDF here'}
+                {dragOver ? 'Drop your PDF or image here' : 'Drag & drop your PDF or image here'}
               </p>
               <p className="text-sm text-slate-400 mt-0.5">or click to browse — max 20 MB</p>
             </div>

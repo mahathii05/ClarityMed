@@ -3,7 +3,7 @@ import Header from './components/Header.jsx'
 import UploadZone from './components/UploadZone.jsx'
 import SkeletonLoader from './components/SkeletonLoader.jsx'
 import ReportView from './components/ReportView.jsx'
-import { extractTextFromPDF } from './utils/pdfExtract.js'
+import { extractTextFromPDF, renderPDFToImages } from './utils/pdfExtract.js'
 import { api } from './utils/api.js'
 
 export default function App() {
@@ -22,16 +22,54 @@ export default function App() {
   const handleFileSelect = async (file) => {
     setError('')
     setStage('processing')
-    setProcessingStep('Extracting text from PDF…')
     setUploadedFile(file)
 
+    const isImage = file.type.startsWith('image/') || /\.(png|jpe?g)$/i.test(file.name)
+
     try {
-      const text = await extractTextFromPDF(file)
-      setOriginalText(text)
-      setProcessingStep('AI is analysing your report…')
-      const data = await api.simplifyReport(text)
-      setReportData(data)
-      setStage('report')
+      if (isImage) {
+        setProcessingStep('AI is performing OCR on your image…')
+        const dataUrl = await new Promise((resolve, reject) => {
+          const r = new FileReader()
+          r.onload = () => resolve(r.result)
+          r.onerror = () => reject(new Error('Failed to read image file'))
+          r.readAsDataURL(file)
+        })
+        setProcessingStep('AI is analysing your report…')
+        const data = await api.simplifyReportImage([dataUrl])
+        setReportData(data.report)
+        setOriginalText(data.ocrText)
+        setStage('report')
+      } else {
+        setProcessingStep('Extracting text from PDF…')
+        let text = ''
+        let isScanned = false
+        try {
+          text = await extractTextFromPDF(file)
+        } catch (err) {
+          if (err.message && err.message.includes('No readable text')) {
+            isScanned = true
+          } else {
+            throw err
+          }
+        }
+
+        if (isScanned || !text.trim()) {
+          setProcessingStep('PDF is scanned. Rendering pages to images (AI OCR)…')
+          const images = await renderPDFToImages(file)
+          setProcessingStep('AI is performing OCR on scanned pages…')
+          const data = await api.simplifyReportImage(images)
+          setReportData(data.report)
+          setOriginalText(data.ocrText)
+          setStage('report')
+        } else {
+          setOriginalText(text)
+          setProcessingStep('AI is analysing your report…')
+          const data = await api.simplifyReport(text)
+          setReportData(data)
+          setStage('report')
+        }
+      }
     } catch (err) {
       console.error(err)
       setError(err.message || 'Something went wrong. Please try again.')

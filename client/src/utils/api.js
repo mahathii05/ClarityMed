@@ -19,6 +19,9 @@ export const api = {
   simplifyReport: (reportText) =>
     post('/report/simplify', { reportText }),
 
+  simplifyReportImage: (images) =>
+    post('/report/simplify-image', { images }),
+
   chat: (reportContext, conversationHistory, userMessage) =>
     post('/chat', { reportContext, conversationHistory, userMessage }),
 

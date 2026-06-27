@@ -37,17 +37,18 @@ Severity rules:
 Be compassionate, avoid alarm, always encourage consulting a doctor."""
 
 
+import asyncio
+from fastapi import HTTPException
+
 class SimplifyRequest(BaseModel):
     reportText: str
 
 
-@router.post("/simplify")
-async def simplify_report(body: SimplifyRequest):
-    if not body.reportText.strip():
-        from fastapi import HTTPException
-        raise HTTPException(status_code=400, detail="reportText is required")
+class SimplifyImageRequest(BaseModel):
+    images: list[str]  # base64 data URLs
 
-    from fastapi import HTTPException
+
+async def run_translation_pipeline(report_text: str) -> dict:
     models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "openai/gpt-oss-20b", "openai/gpt-oss-120b"]
     last_error = None
 
@@ -57,7 +58,7 @@ async def simplify_report(body: SimplifyRequest):
                 model=m,
                 messages=[
                     {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": f"Simplify this medical report:\n\n{body.reportText}"},
+                    {"role": "user", "content": f"Simplify this medical report:\n\n{report_text}"},
                 ],
                 max_tokens=4096,
             )
@@ -70,3 +71,65 @@ async def simplify_report(body: SimplifyRequest):
     if isinstance(last_error, HTTPException):
         raise last_error
     raise HTTPException(status_code=502, detail=str(last_error))
+
+
+async def perform_ocr(image_b64: str) -> str:
+    messages = [
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": (
+                        "Transcribe all text from this medical lab report image verbatim. "
+                        "Do not explain, format, or summarize. Just output the extracted text."
+                    )
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": image_b64
+                    }
+                }
+            ]
+        }
+    ]
+    raw_text = await groq_chat(
+        model="meta-llama/llama-4-scout-17b-16e-instruct",
+        messages=messages,
+        temperature=0.1,
+        max_tokens=4096,
+    )
+    return raw_text
+
+
+@router.post("/simplify")
+async def simplify_report(body: SimplifyRequest):
+    if not body.reportText.strip():
+        raise HTTPException(status_code=400, detail="reportText is required")
+    return await run_translation_pipeline(body.reportText)
+
+
+@router.post("/simplify-image")
+async def simplify_report_image(body: SimplifyImageRequest):
+    if not body.images:
+        raise HTTPException(status_code=400, detail="images list is required")
+
+    try:
+        ocr_tasks = [perform_ocr(img) for img in body.images]
+        ocr_results = await asyncio.gather(*ocr_tasks)
+        combined_text = "\n\n--- Page Break ---\n\n".join(ocr_results)
+    except Exception as e:
+        import sys
+        print(f"OCR failed: {e}", file=sys.stderr)
+        raise HTTPException(status_code=502, detail=f"Image transcription (OCR) failed: {e}")
+
+    if not combined_text.strip():
+        raise HTTPException(status_code=422, detail="No readable text could be extracted from the uploaded image(s).")
+
+    structured_report = await run_translation_pipeline(combined_text)
+    return {
+        "report": structured_report,
+        "ocrText": combined_text
+    }
+
