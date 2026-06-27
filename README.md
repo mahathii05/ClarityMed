@@ -15,7 +15,7 @@ claritymed-v3/
 │   ├── requirements.txt     ← Python dependencies
 │   ├── .env.example         ← Copy to .env, add your key
 │   └── routes/
-│       ├── report.py        ← POST /api/report/simplify
+│       ├── report.py        ← POST /api/report/simplify & /simplify-image
 │       ├── chat.py          ← POST /api/chat
 │       ├── diet.py          ← POST /api/diet/generate
 │       ├── actions.py       ← POST /api/actions/generate
@@ -33,6 +33,7 @@ claritymed-v3/
 ## Features
 
 - 🔬 **Report Simplification** — plain-language explanation of every lab result (Llama 3.3 70B, with fallback chain to Llama 3.1, GPT-OSS 20B, and GPT-OSS 120B)
+- 📸 **Image & Scanned PDF Support (Vision OCR)** — support for photos (PNG, JPEG) and scanned PDFs; client-side rendering converts scanned PDF pages to base64 images, and Groq multimodal Llama 4 Scout Vision performs high-speed OCR, transcribing content automatically
 - 📊 **Summary Metrics Dashboard** — sliding graphical gauges for numeric ranges and color-coded status badges for qualitative results
 - ⚡ **Interactive Document View & Syncing** — dual pane split-view where selecting text on the interactive sheet automatically highlights and expands the matching card on the right, and vice-versa
 - 🎨 **Earthy Sage Green Theme** — beautiful light-mode styling utilizing Calm Sage Green (#67a387) accents and a soft, warm sand/alabaster background (#fbfbfa)
