@@ -26,6 +26,10 @@ A multi-agent nutritional counseling planner compiling Daily Meal plans (breakfa
 Evidence-based recommendations indicating clinical visit urgency, follow-up tests, exercise recommendations, and critical warning signs to monitor.
 ![Clinical Recommendations](screenshots/5_clinical_recommendations.png)
 
+#### 6. Interactive AI Report Assistant
+An interactive conversational chatbot interface powered by Llama 3.1 8B, allowing patients to ask follow-up questions about their specific laboratory results and retrieve tailored patient education. Includes context-aware suggested query prompts.
+![Interactive AI Assistant](screenshots/6_interactive_chatbot.png)
+
 ---
 
 ## ⚙️ Core Architecture & Engineering Highlights
